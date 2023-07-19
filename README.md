@@ -66,7 +66,7 @@ find /etc -type f -print0 | ipv4grep -i 1.2.3.4
 ```
 
 Note the use of the `-print0` command line argument with the find command. This uses a null character (ASCII code 0) to separate the
-filenames. This is because when the `ipv4grep` command reads filenames from standard input it recognised the null character as
+filenames. This is because when the `ipv4grep` command reads filenames from standard input it recognises the null character as
 the delimiter.
 
 # Linux systems and /sys and /proc
@@ -86,6 +86,23 @@ or:
 are ignored. This is because on a Linux system the content of the files
 under these directories is dynamic. Also trying to read from some of
 these files will cause the `ipv4grep` command to block.
+
+If you do not want this to happen then delete these lines:
+
+```
+if (stringbegins(line, "/sys/")) {
+        continue;
+}
+
+if (stringbegins(line, "/proc/")) {
+        continue;
+}
+```
+
+from the `ipv4grep.c` file before compiling it.
+
+I might add a command line switch to toggle this.
+
 
 # IPv4 address checking
 
@@ -119,8 +136,9 @@ ipv4grep -f filename -i 001.002.003.004 -c n
 The matching code could probably be faster.
 
 Not searching the whole of the file might mean the IPv4 address could be in the later section of a file but
-the `ipv4grep` command will not find it. If you want the entire file searched regardless of how big it is then
-use a different tool.
+the `ipv4grep` command will not find it.
 
-----------------------------------------------------
+If you want the entire file searched regardless of how big it is then just use the standard grep command.
+
+----------------
 End of README.md
