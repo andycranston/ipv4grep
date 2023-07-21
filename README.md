@@ -43,14 +43,14 @@ Use a command line similar to:
 ipv4grep -f filename -i 1.2.3.4
 ```
 
-This will search the file `filename` for the IPv4 address 1.2.3.4 - if that IPv4 address is present at least once in the file the name of
+This will search the file `filename` for the IPv4 address `1.2.3.4` - if that IPv4 address is present at least once in the file the name of
 the file is printed on stdout and a return code of 0 is given. If the IPv4 address is not found then no output is printed and
 a return code of 1 is given.
 
-Only the first 1,000,000 bytes of a file is searched. IPv4 addresses are usually in files much smaller
+Remember that only the first 1,000,000 bytes of a file is searched bu the `ipv4grep` command. IPv4 addresses are usually in files much smaller
 than 1,000,000 bytes such as configuration files.
 
-If more or less bytes need to be searched the `-s` command line option can be used. For example to search the first 5,000,000 bytes use:
+If more bytes need to be searched the `-s` command line option can be used. For example to search the first 5,000,000 bytes use:
 
 ```
 ipv4grep -s 5000000 -f filename -i 1.2.3.4
@@ -58,8 +58,8 @@ ipv4grep -s 5000000 -f filename -i 1.2.3.4
 
 # Searching multiple files
 
-To search multiple files leave out the `-f` command line argument and filename and, instead, feed the `ipv4grep`
-command a list of filenames on stdin. For example:
+To search multiple files leave out the `-f` command line argument and filename and, instead, send the `ipv4grep`
+command a list of filenames on standard input. For example:
 
 ```
 find /etc -type f -print0 | ipv4grep -i 1.2.3.4
@@ -87,7 +87,7 @@ are ignored by the `ipv4grep` command. This is because on a Linux system the con
 under these directories is dynamic. Also trying to read from some of
 these files will cause the `ipv4grep` command to hang/block on the read operation.
 
-If you do not want this to happen then delete these lines:
+If you want files that begin `/sys/` and `/proc/` to be searched then delete these lines:
 
 ```
 if (stringbegins(line, "/sys/")) {
@@ -102,7 +102,6 @@ if (stringbegins(line, "/proc/")) {
 from the `ipv4grep.c` source code file before compiling it.
 
 I might add a command line switch to toggle this.
-
 
 # IPv4 address checking
 
