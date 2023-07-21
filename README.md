@@ -1,6 +1,7 @@
 # Search for IPv4 addresses in one or more files
 
-Searches a file (or files) for an IPv4 address. Has logic to make sure an IPv4 address such as:
+The `ipv4grep` command searches a file (or files) for an IPv4 address. It has
+logic to make sure an IPv4 address such as:
 
 ```
 1.2.3.4
@@ -12,13 +13,11 @@ does not give a false positive match to a file containing:
 11.2.3.44
 ```
 
-which a simple:
+The `ipv4grep` command also saves time when dealing with large files (e.g. database files) by
+only searching the first 1,000,000 bytes of a file over 1,000,000 bytes in size.
 
-```
-grep 1.2.3.4 filename
-```
-
-would.
+While this behaviour may miss some files which do contain the IPv4 address the assumption is that
+the `ipv4grep` command is being used to locate an IPv4 address in much smaller configuration files.
 
 # Source code and compiling
 
@@ -48,7 +47,7 @@ This will search the file `filename` for the IPv4 address 1.2.3.4 - if that IPv4
 the file is printed on stdout and a return code of 0 is given. If the IPv4 address is not found then no output is printed and
 a return code of 1 is given.
 
-Only the first 1,000,000 bytes of a file is searched - this is for performance reasons. IPv4 addresses are usually in files much smaller
+Only the first 1,000,000 bytes of a file is searched. IPv4 addresses are usually in files much smaller
 than 1,000,000 bytes such as configuration files.
 
 If more or less bytes need to be searched the `-s` command line option can be used. For example to search the first 5,000,000 bytes use:
@@ -59,15 +58,16 @@ ipv4grep -s 5000000 -f filename -i 1.2.3.4
 
 # Searching multiple files
 
-To search multiple files leave out the `-f` command line argument and file name and, instead, feed a list of filenames on stdin. For example:
+To search multiple files leave out the `-f` command line argument and filename and, instead, feed the `ipv4grep`
+command a list of filenames on stdin. For example:
 
 ```
 find /etc -type f -print0 | ipv4grep -i 1.2.3.4
 ```
 
 Note the use of the `-print0` command line argument with the find command. This uses a null character (ASCII code 0) to separate the
-filenames. This is because when the `ipv4grep` command reads filenames from standard input it recognises the null character as
-the delimiter.
+filenames. This is because when the `ipv4grep` command reads filenames from standard input it uses the null character as
+the delimiter character.
 
 # Linux systems and /sys and /proc
 
@@ -83,9 +83,9 @@ or:
 /proc/
 ```
 
-are ignored. This is because on a Linux system the content of the files
+are ignored by the `ipv4grep` command. This is because on a Linux system the content of the files
 under these directories is dynamic. Also trying to read from some of
-these files will cause the `ipv4grep` command to block.
+these files will cause the `ipv4grep` command to hang/block on the read operation.
 
 If you do not want this to happen then delete these lines:
 
@@ -99,7 +99,7 @@ if (stringbegins(line, "/proc/")) {
 }
 ```
 
-from the `ipv4grep.c` file before compiling it.
+from the `ipv4grep.c` source code file before compiling it.
 
 I might add a command line switch to toggle this.
 
@@ -122,10 +122,10 @@ are all valid IPv4 addresses but:
 001.002.003.004
 ```
 
-are not as octets are not allowed to have leading zeroes.
+are not as the octets that make up an IPv4 address are not allowed to have leading zeroes.
 
 If this is to restrictive the check for a valid IPv4 address can be skipped by using the `-c` command
-line option as follows:
+line option with an argument of 'n' as follows:
 
 ```
 ipv4grep -f filename -i 001.002.003.004 -c n
@@ -134,11 +134,6 @@ ipv4grep -f filename -i 001.002.003.004 -c n
 # Known issues
 
 The matching code could probably be faster.
-
-Not searching the whole of the file might mean the IPv4 address could be in the later section of a file but
-the `ipv4grep` command will not find it.
-
-If you want the entire file searched regardless of how big it is then just use the standard grep command.
 
 ----------------
 End of README.md
